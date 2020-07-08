@@ -2,6 +2,7 @@ const express = require('express');
 const bodyparser = require('body-parser');
 const mongoose = require('mongoose');
 const Promotions = require('../models/promotions');
+const authenticate = require('../authenticate');
 
 const promoRouter = express.Router();
 
@@ -18,7 +19,7 @@ promoRouter.route('/')
     }, (err) => next(err))
     .catch((err) => next(err));
 })
-.post( (req, res, next) =>{
+.post( authenticate.verifyUser, (req, res, next) =>{
     Promotions.create(req.body)
     .then((promotion) => {
         console.log("Promotion created", promotions);
@@ -28,11 +29,11 @@ promoRouter.route('/')
     }, (err) => next(err))
     .catch((err) => next(err));
 })
-.put( (req, res, next) =>{
+.put( authenticate.verifyUser, (req, res, next) =>{
     res.statusCode = 403
     res.end('This operation is not avaiable for promotions');
 })
-.delete( (req, res, next) =>{
+.delete( authenticate.verifyUser, (req, res, next) =>{
     Promotions.remove({})
     .then((resp) => {
         console.log("Deleted");
@@ -55,11 +56,11 @@ promoRouter.route('/:promoId')
     },  (err) => next(err))
     .catch((err) => next(err));
 })
-.post( (req, res, next) =>{
+.post( authenticate.verifyUser, (req, res, next) =>{
     res.statusCode = 403
     res.end('This operation is not avaiable for promotion id');
 })
-.put( (req, res, next) =>{
+.put( authenticate.verifyUser, (req, res, next) =>{
     Promotions.findByIdAndUpdate(req.params.promoId, { $set: req.body}, {new : true})
     .then((promotion) => {
         console.log("Promotion updated");
@@ -69,7 +70,7 @@ promoRouter.route('/:promoId')
     }, (err) => next(err))
     .catch((err) => next(err));
 })
-.delete( (req, res, next) =>{
+.delete( authenticate.verifyUser, (req, res, next) =>{
     Promotions.findByIdAndRemove(req.params.promoId)
     .then((resp) => {
         console.log("Promotion deleted");
