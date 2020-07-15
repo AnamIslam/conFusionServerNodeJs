@@ -19,7 +19,7 @@ leaderRouter.route('/')
     }, (err) => next(err))
     .catch((err) => next(err));
 })
-.post( authenticate.verifyUser, (req, res, next) =>{
+.post( authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) =>{
     Leaders.create(req.body)
     .then((leader) => {
         console.log("Leader created", leader);
@@ -29,11 +29,11 @@ leaderRouter.route('/')
     }, (err) => next(err))
     .catch((err) => next(err));
 })
-.put( authenticate.verifyUser, (req, res, next) =>{
+.put( authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) =>{
     res.statusCode = 403
     res.end('This operation is not avaiable for /leaders');
 })
-.delete( authenticate.verifyUser, (req, res, next) =>{
+.delete( authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) =>{
     Leaders.remove({})
     .then((resp) => {
         console.log("Deleted");
@@ -56,11 +56,11 @@ leaderRouter.route('/:leaderId')
     },  (err) => next(err))
     .catch((err) => next(err));
 })
-.post( authenticate.verifyUser, (req, res, next) =>{
+.post( authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) =>{
     res.statusCode = 403
     res.end('This operation is not avaiable for leader id');
 })
-.put( authenticate.verifyUser, (req, res, next) =>{
+.put( authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) =>{
     Leaders.findByIdAndUpdate(req.params.leaderId, { $set: req.body}, {new : true})
     .then((leader) => {
         console.log("Leader updated");
@@ -70,7 +70,7 @@ leaderRouter.route('/:leaderId')
     }, (err) => next(err))
     .catch((err) => next(err));
 })
-.delete( authenticate.verifyUser, (req, res, next) =>{
+.delete( authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) =>{
     Leaders.findByIdAndRemove(req.params.leaderId)
     .then((resp) => {
         console.log("Leader deleted");
