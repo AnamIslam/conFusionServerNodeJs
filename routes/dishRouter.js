@@ -207,9 +207,9 @@ dishRouter.route('/:dishId/comments/:commentId')
     .then((dish) =>{
         var thisComment = dish.comments.id(req.params.commentId);
 
-        if(thisComment.author._id != req.user._id)
+        if(!thisComment.author._id.equals(req.user._id))
         {
-            var err = new err('You are not the author of this comment');
+            var err = new Error('You are not the author of this comment');
             err.status = 403;
             return next(err);
         }
@@ -252,9 +252,9 @@ dishRouter.route('/:dishId/comments/:commentId')
     .then((dish) => {
         var thisComment = dish.comments.id(req.params.commentId);
 
-        if(thisComment.author._id != req.user._id)
+        if(!thisComment.author._id.equals(req.user._id))
         {
-            var err = new err('You are not the author of this comment');
+            var err = new Error('You are not the author of this comment');
             err.status = 403;
             return next(err);
         }        
