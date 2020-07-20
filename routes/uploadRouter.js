@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyparser = require('body-parser');
 const multer = require('multer');
+const cors = require('./cors');
 const authenticate = require('../authenticate');
 
 const storage = multer.diskStorage({
@@ -27,20 +28,21 @@ const uploadRouter = express.Router();
 uploadRouter.use(bodyparser.json());
 
 uploadRouter.route('/')
-.get( authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) =>{
+.options(cors.corsWithOptions, (req, res) => { res.sendStatus(200); })
+.get(cors.cors, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) =>{
     res.statusCode = 403;
     res.end('This operation is not avaiable for /imagesUpload');
 })
-.post( authenticate.verifyUser, authenticate.verifyAdmin, upload.single('imageFile'), (req, res, next) =>{
+.post(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, upload.single('imageFile'), (req, res, next) =>{
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
     res.json(req.file);
 })
-.post( authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) =>{
+.post(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) =>{
     res.statusCode = 403;
     res.end('This operation is not avaiable for /imagesUpload');
 })
-.delete( authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) =>{
+.delete(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) =>{
     res.statusCode = 403;
     res.end('This operation is not avaiable for /imagesUpload');
 })
