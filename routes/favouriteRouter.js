@@ -2,7 +2,7 @@ const express = require('express');
 const bodyparser = require('body-parser');
 const mongoose = require('mongoose');
 const cors = require('./cors');
-const Favourites = require('../models/favourite');
+const Favourites = require('../models/favourites');
 const authenticate = require('../authenticate');
 
 const favouriteRouter = express.Router();
@@ -118,35 +118,24 @@ favouriteRouter.route('/')
 favouriteRouter.route('/:dishId')
 .options(cors.corsWithOptions, authenticate.verifyUser, (req, res) => { res.sendStatus(200); })
 .get(cors.cors, (req, res, next) =>{
-    Favourites.find({})
-    .populate('dishes')
-    .populate('user')
+    Favourites.findOne({user: req.user._id})
     .then((favourites) =>{
-        //var user;
-        if(favourites)
-        {
-            var user_favourites = favourites.filter( fav => fav.user._id.toString() === req.user.id.toString())[0]; //I have no idea!!!
-            var dish = user_favourites.filter( dish => dish.id === req.params.dishId)[0];
-            if(dish)
-            {
-                res.statusCode = 200;
-                res.setHeader('Content-Type','application/json');
-                res.json(dish);
-                
-            }
-            else
-            {
-                var err = new Error('You do not have this dish :' + req.param.dishId);
-                err.status = 404;
-                return next(err);
-            }
-            
+        if(!favourites){
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'application/json');
+            return res.json({"exists": false, "favourites": favpurites});
         }
-        else
-        {
-            var err = new Error("You have no favourite");
-            err.status = 404;
-            return next(err);
+        else{
+            if(favourites.dishes.indexOf(req.params.dishId)<0){
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                return res.json({"exists": false, "favourites": favpurites});
+            }
+            else{
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                return res.json({"exists": true, "favourites": favpurites});
+            }
         }
     }, (err) => next(err))
     .catch((err) => next(err));
